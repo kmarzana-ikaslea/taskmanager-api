@@ -1,14 +1,13 @@
 package com.leetjourney.taskmanager.service;
 
+import com.leetjourney.taskmanager.dto.PageResponse;
 import com.leetjourney.taskmanager.dto.TaskResponse;
 import com.leetjourney.taskmanager.entity.Task;
 import com.leetjourney.taskmanager.exception.ResourceNotFoundException;
 import com.leetjourney.taskmanager.repository.TaskRepository;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class TaskService {
@@ -19,11 +18,20 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<TaskResponse> getAllTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(TaskResponse::from)
-                .toList();
+    public PageResponse<TaskResponse> getAllTasks(int page, int size) {
+        Page<TaskResponse> taskPage = taskRepository
+                .findAll(PageRequest.of(page, size))
+                .map(TaskResponse::from);
+
+        return new PageResponse<>(
+                taskPage.getContent(),
+                taskPage.getNumber(),
+                taskPage.getSize(),
+                taskPage.getTotalElements(),
+                taskPage.getTotalPages(),
+                taskPage.isFirst(),
+                taskPage.isLast()
+        );
     }
 
     public TaskResponse getTaskById(Long id) {

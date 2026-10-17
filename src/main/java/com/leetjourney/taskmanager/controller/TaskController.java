@@ -1,14 +1,15 @@
 package com.leetjourney.taskmanager.controller;
 
+import com.leetjourney.taskmanager.dto.PageResponse;
 import com.leetjourney.taskmanager.dto.TaskResponse;
 import com.leetjourney.taskmanager.service.TaskService;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Validated
 @RestController
@@ -22,8 +23,14 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> findAll() {
-        return new ResponseEntity<>(taskService.getAllTasks(), HttpStatus.OK);
+    public ResponseEntity<PageResponse<TaskResponse>> findAll(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "${tasks.pagination.default-size}")
+            @Positive(message = "Page size must be greater than zero")
+            @Max(value = 50, message = "Page size must be at most {value}")
+            int size
+    ) {
+        return new ResponseEntity<>(taskService.getAllTasks(page, size), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
