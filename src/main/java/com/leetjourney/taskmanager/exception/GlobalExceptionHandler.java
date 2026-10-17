@@ -1,5 +1,6 @@
 package com.leetjourney.taskmanager.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +16,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
-            ResourceNotFoundException ex) {
+            ResourceNotFoundException ex,
+            HttpServletRequest request) {
 
         Map<String, Object> response = Map.of(
                 "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "message", ex.getMessage()
+                "status", HttpStatus.NOT_FOUND.value(),
+                "message", ex.getMessage(),
+                "path", request.getRequestURI()
         );
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolationException(
-            ConstraintViolationException ex) {
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
 
         Map<String, Object> response = new HashMap<>();
 
@@ -41,7 +45,8 @@ public class GlobalExceptionHandler {
                 Map.of(
                         "timestamp", LocalDateTime.now().toString(),
                         "status", HttpStatus.BAD_REQUEST.value(),
-                        "message", message
+                        "message", message,
+                        "path", request.getRequestURI()
                 ),
                 HttpStatus.BAD_REQUEST);
     }
