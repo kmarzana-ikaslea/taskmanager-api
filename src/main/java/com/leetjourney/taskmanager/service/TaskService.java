@@ -34,6 +34,17 @@ public class TaskService {
 
         return TaskResponse.from(task);
     }
+
+    public void deleteTaskById(Long id) {
+        taskRepository.delete(this.getEntityById(id));
+    }
+
+    private Task getEntityById(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Task with id " + id + " not found!"
+                ));
+    }
 }
 
 //  org.springframework.stereotype.Service

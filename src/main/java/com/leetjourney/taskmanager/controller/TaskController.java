@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,10 +29,16 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> findById(
             @PathVariable
-            @Positive(
-                    message = "Task id must be greater than zero"
-            )
-            Long id) {
+            @Positive(message = "Task id must be greater than zero") Long id) {
         return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(
+            @PathVariable
+            @Positive(message = "Task id must be greater than zero") Long id) {
+        taskService.deleteTaskById(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
